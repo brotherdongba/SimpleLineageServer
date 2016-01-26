@@ -9,10 +9,12 @@ import com.dongba.model.Monster;
 
 public class LineageServer extends Thread {
 	
-	private MessageBroadcaster broadcaster;
+	private MessageSender messageSender;
+	private MonsterManager monsterManager;
 	
 	public LineageServer() {
-		broadcaster = new MessageBroadcaster();
+		messageSender = new MessageSender();
+		monsterManager = new MonsterManager();
 	}
 	
 	@Override
@@ -23,9 +25,9 @@ public class LineageServer extends Thread {
 				System.out.println("Waiting client connection...");
 				Socket socket = serverSocket.accept();
 				System.out.println("established client connection : " + socket.getInetAddress());
-				broadcaster.addClient(new Client(socket));
-				ClientThread client = new ClientThread(socket, broadcaster);
-				client.start();
+				ClientMessageTransporter clientMessageTransporter = new ClientMessageTransporter(socket, messageSender, monsterManager);
+				messageSender.addClientMessageTransporter(clientMessageTransporter);
+				clientMessageTransporter.start();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -33,11 +35,12 @@ public class LineageServer extends Thread {
 		}
 	}
 	
-	public void addNForwardMonster(Monster monster) {
-		broadcaster.addNForwardMonster(monster);
+	public void addNForwardMonster(Monster monster) throws InterruptedException {
+		monsterManager.addMonster(monster);
+		messageSender.broadcast(monster);
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		LineageServer server = new LineageServer();
 		server.start();
 		
