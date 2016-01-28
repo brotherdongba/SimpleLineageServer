@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import com.dongba.model.ClientMessage;
+import com.dongba.model.Account;
 
 public class ClientMessageTransporter extends Thread {
 	
@@ -13,12 +13,13 @@ public class ClientMessageTransporter extends Thread {
 	private Socket socket;
 	private ClientMessageInterpreter clientMessageInterpreter;
 	private ClientMessageProcessor clientMessageProcessor;
+	private Account account;
 
-	public ClientMessageTransporter(Socket socket, MessageSender messageSender, MonsterManager monsterMgmtService) throws IOException {
+	public ClientMessageTransporter(Socket socket, MessageSender messageSender, MonsterManager monsterManager) throws IOException {
 		this.socket = socket;
 		this.messageSender = messageSender;
 		this.clientMessageInterpreter = new ClientMessageInterpreter();
-		this.clientMessageProcessor = new ClientMessageProcessor();
+		this.clientMessageProcessor = new ClientMessageProcessor(monsterManager);
 	}
 
 	public void run() {
@@ -31,7 +32,11 @@ public class ClientMessageTransporter extends Thread {
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 				Object obj = in.readObject();
 				System.out.println(obj.toString());
-				ClientMessage interpretedMsg = clientMessageInterpreter.interpret(obj);
+				if (obj instanceof Account) {
+					this.account = (Account) obj;
+					System.out.println("user " + account.getId() + " is logged in.");
+				}
+				Object interpretedMsg = clientMessageInterpreter.interpret(obj);
 				try {
 					clientMessageProcessor.process(interpretedMsg, messageSender);
 				} catch (InterruptedException e) {
@@ -66,7 +71,13 @@ public class ClientMessageTransporter extends Thread {
 		}
 		return true;
 	}
-	
-	
+
+	public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
 
 }

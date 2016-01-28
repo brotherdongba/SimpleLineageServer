@@ -50,7 +50,7 @@ public class LineageServer extends Thread {
 			
 			String[] split = monsterSpec.split(" ");
 			// "oak#1 oak 1000"
-			Monster monster = new Monster(split[0], split[1], Integer.parseInt(split[2]));
+			Monster monster = new Monster(null, split[0], split[1], Integer.parseInt(split[2]));
 			server.addNForwardMonster(monster);
 		}
 	}

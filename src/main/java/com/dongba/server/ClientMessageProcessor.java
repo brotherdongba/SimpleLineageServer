@@ -2,28 +2,25 @@ package com.dongba.server;
 
 import com.dongba.model.CharacterMotion;
 import com.dongba.model.ChatMessage;
-import com.dongba.model.ClientMessage;
-import com.dongba.model.MessageType;
 import com.dongba.model.Monster;
 
 public class ClientMessageProcessor {
 
 	private MonsterManager monsterManager;
 
-	public ClientMessageProcessor() {
-		this.monsterManager = new MonsterManager();
+	public ClientMessageProcessor(MonsterManager monsterManager) {
+		this.monsterManager = monsterManager;
 	}
 
-	public void process(ClientMessage interpretedMsg, MessageSender messageSender) throws InterruptedException {
-		MessageType type = interpretedMsg.getType();
-		switch (type) {
-		case CHARACTERMOTION :
+	public void process(Object interpretedMsg, MessageSender messageSender) throws InterruptedException {
+		if (interpretedMsg instanceof CharacterMotion) {
 			CharacterMotion motion = (CharacterMotion) interpretedMsg;
 			String targetMonsterId = motion.getTargetId();
 			int damage = motion.getDamage();
 			//get monster from the monsterMgmtService
 			Monster monster = monsterManager.getMonster(targetMonsterId);
 			//process client attck
+			monster.setFromCharacter(motion.getCharacterId());
 			int orgHp = monster.getHp();
 			int chdHp = orgHp - damage;
 			monster.setHp(chdHp);
@@ -31,12 +28,9 @@ public class ClientMessageProcessor {
 			monsterManager.updateMonsterStatus(monster);
 			//broadcast updated monster status
 			messageSender.broadcast(monster);
-			break;
-		case CHATMESSAGE :
+		} else if (interpretedMsg instanceof ChatMessage) {
 			ChatMessage chatMessage = (ChatMessage) interpretedMsg;
 			messageSender.broadcast(chatMessage);
-		default:
-			break;
 		}
 	}
 }
