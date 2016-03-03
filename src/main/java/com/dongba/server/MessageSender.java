@@ -3,6 +3,7 @@ package com.dongba.server;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.dongba.model.Account;
 import com.dongba.model.ChatMessage;
@@ -23,6 +24,10 @@ public class MessageSender {
 	public void broadcast(Monster monster) throws InterruptedException {
 		forward(monster);
 	}
+	
+	public Set<Entry<String, ClientMessageTransporter>> getClientEntrySet() {
+		return clientMessageTransporters.entrySet();
+	}
 
 	private void forward(Object obj) throws InterruptedException {
 		Map<String, ClientMessageTransporter> tmpTransporters = new HashMap<String, ClientMessageTransporter>();
@@ -33,9 +38,10 @@ public class MessageSender {
 				continue;
 			}
 			if (clientMessageTransporter.sendMessage(obj) == false) {
-				String transporterKey = entry.getKey();
-				clientMessageTransporters.get(transporterKey).join();
-				clientMessageTransporters.remove(transporterKey);
+				ClientMessageTransporter cmt = entry.getValue();
+				System.out.println("user " + cmt.getAccount().getId() + " is logged out.");
+				cmt.join();
+				removeClientMessageTransporter(cmt);
 			}
 		}
 	}

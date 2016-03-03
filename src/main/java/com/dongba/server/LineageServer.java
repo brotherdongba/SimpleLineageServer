@@ -10,11 +10,16 @@ import com.dongba.model.Monster;
 public class LineageServer extends Thread {
 	
 	private MessageSender messageSender;
+	
 	private MonsterManager monsterManager;
 	
 	public LineageServer() {
 		messageSender = new MessageSender();
 		monsterManager = new MonsterManager();
+	}
+	
+	public MessageSender getMessageSender() {
+		return messageSender;
 	}
 	
 	@Override
@@ -43,7 +48,8 @@ public class LineageServer extends Thread {
 	public static void main(String[] args) throws InterruptedException {
 		LineageServer server = new LineageServer();
 		server.start();
-		
+		ClientMgmtService cms = new ClientMgmtService(server.getMessageSender());
+		new Thread(cms).start();
 		while (true) {
 			Scanner in = new Scanner(System.in);
 			String monsterSpec = in.nextLine();

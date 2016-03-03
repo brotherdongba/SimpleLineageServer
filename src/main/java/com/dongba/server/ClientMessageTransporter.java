@@ -23,38 +23,36 @@ public class ClientMessageTransporter extends Thread {
 	}
 
 	public void run() {
-		receiveMessage();
+		try {
+			receiveMessage();
+		} catch (ClassNotFoundException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
-	private void receiveMessage() {
+	private void receiveMessage() throws ClassNotFoundException {
 		try {
 			while (true) {
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 				Object obj = in.readObject();
-				System.out.println(obj.toString());
 				if (obj instanceof Account) {
 					this.account = (Account) obj;
 					System.out.println("user " + account.getId() + " is logged in.");
-				}
-				Object interpretedMsg = clientMessageInterpreter.interpret(obj);
-				try {
-					clientMessageProcessor.process(interpretedMsg, messageSender);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} else {
+					System.out.println(obj.toString());
+					Object interpretedMsg = clientMessageInterpreter.interpret(obj);
+					try {
+						clientMessageProcessor.process(interpretedMsg, messageSender);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		} catch (IOException e) {
+			System.out.println("user " + account.getId() + " is logged out.");
 			try {
 				this.join();
 			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-			messageSender.removeClientMessageTransporter(this);
-		} catch (ClassNotFoundException e) {
-			try {
-				this.join();
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
 			}
 			messageSender.removeClientMessageTransporter(this);
 		}
