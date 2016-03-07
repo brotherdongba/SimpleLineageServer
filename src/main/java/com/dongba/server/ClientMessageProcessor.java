@@ -12,7 +12,7 @@ public class ClientMessageProcessor {
 		this.monsterManager = monsterManager;
 	}
 
-	public void process(Object interpretedMsg, MessageSender messageSender) throws InterruptedException {
+	public void process(Object interpretedMsg, ClientMessageTransportManager messageTransportManager) throws InterruptedException {
 		if (interpretedMsg instanceof CharacterMotion) {
 			CharacterMotion motion = (CharacterMotion) interpretedMsg;
 			String targetMonsterId = motion.getTargetId();
@@ -26,11 +26,17 @@ public class ClientMessageProcessor {
 			monster.setHp(chdHp);
 			//update monster status at the broadcaster
 			monsterManager.updateMonsterStatus(monster);
-			//broadcast updated monster status
-			messageSender.broadcast(monster);
+			//send updated monster status
+			send(messageTransportManager, monster);
 		} else if (interpretedMsg instanceof ChatMessage) {
+			//send updated monster status
 			ChatMessage chatMessage = (ChatMessage) interpretedMsg;
-			messageSender.broadcast(chatMessage);
+			send(messageTransportManager, chatMessage);
 		}
+	}
+
+	private void send(ClientMessageTransportManager messageTransportManager, Object obj) {
+		ClientMessageBroadcastSender cmbs = new ClientMessageBroadcastSender();
+		cmbs.send(messageTransportManager, obj);
 	}
 }

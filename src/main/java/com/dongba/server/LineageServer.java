@@ -9,17 +9,17 @@ import com.dongba.model.Monster;
 
 public class LineageServer extends Thread {
 	
-	private MessageSender messageSender;
+	private ClientMessageTransportManager messageTransportManager;
 	
 	private MonsterManager monsterManager;
 	
 	public LineageServer() {
-		messageSender = new MessageSender();
+		messageTransportManager = new ClientMessageTransportManager();
 		monsterManager = new MonsterManager();
 	}
 	
-	public MessageSender getMessageSender() {
-		return messageSender;
+	public ClientMessageTransportManager getMessageSender() {
+		return messageTransportManager;
 	}
 	
 	@Override
@@ -30,26 +30,24 @@ public class LineageServer extends Thread {
 				System.out.println("Waiting client connection...");
 				Socket socket = serverSocket.accept();
 				System.out.println("established client connection : " + socket.getInetAddress());
-				ClientMessageTransporter clientMessageTransporter = new ClientMessageTransporter(socket, messageSender, monsterManager);
-				messageSender.addClientMessageTransporter(clientMessageTransporter);
+				ClientMessageTransporter clientMessageTransporter = new ClientMessageTransporter(socket, messageTransportManager, monsterManager);
+				messageTransportManager.addClientMessageTransporter(clientMessageTransporter);
 				clientMessageTransporter.start();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	public void addNForwardMonster(Monster monster) throws InterruptedException {
 		monsterManager.addMonster(monster);
-		messageSender.broadcast(monster);
+		ClientMessageBroadcastSender cmbs = new ClientMessageBroadcastSender();
+		cmbs.send(messageTransportManager, monster);
 	}
 	
 	public static void main(String[] args) throws InterruptedException {
 		LineageServer server = new LineageServer();
 		server.start();
-		ClientMgmtService cms = new ClientMgmtService(server.getMessageSender());
-		new Thread(cms).start();
 		while (true) {
 			Scanner in = new Scanner(System.in);
 			String monsterSpec = in.nextLine();

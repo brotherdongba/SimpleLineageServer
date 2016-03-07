@@ -9,15 +9,15 @@ import com.dongba.model.Account;
 
 public class ClientMessageTransporter extends Thread {
 	
-	private MessageSender messageSender;
+	private ClientMessageTransportManager messageTransportManager;
 	private Socket socket;
 	private ClientMessageInterpreter clientMessageInterpreter;
 	private ClientMessageProcessor clientMessageProcessor;
 	private Account account;
 
-	public ClientMessageTransporter(Socket socket, MessageSender messageSender, MonsterManager monsterManager) throws IOException {
+	public ClientMessageTransporter(Socket socket, ClientMessageTransportManager messageSender, MonsterManager monsterManager) throws IOException {
 		this.socket = socket;
-		this.messageSender = messageSender;
+		this.messageTransportManager = messageSender;
 		this.clientMessageInterpreter = new ClientMessageInterpreter();
 		this.clientMessageProcessor = new ClientMessageProcessor(monsterManager);
 	}
@@ -39,10 +39,9 @@ public class ClientMessageTransporter extends Thread {
 					this.account = (Account) obj;
 					System.out.println("user " + account.getId() + " is logged in.");
 				} else {
-					System.out.println(obj.toString());
 					Object interpretedMsg = clientMessageInterpreter.interpret(obj);
 					try {
-						clientMessageProcessor.process(interpretedMsg, messageSender);
+						clientMessageProcessor.process(interpretedMsg, messageTransportManager);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -51,10 +50,9 @@ public class ClientMessageTransporter extends Thread {
 		} catch (IOException e) {
 			System.out.println("user " + account.getId() + " is logged out.");
 			try {
-				this.join();
+				messageTransportManager.removeNRelease(this.getName());
 			} catch (InterruptedException e1) {
 			}
-			messageSender.removeClientMessageTransporter(this);
 		}
 	}
 
