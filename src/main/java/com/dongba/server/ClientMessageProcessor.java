@@ -6,13 +6,11 @@ import com.dongba.model.Monster;
 
 public class ClientMessageProcessor {
 
-	private MonsterManager monsterManager;
 
-	public ClientMessageProcessor(MonsterManager monsterManager) {
-		this.monsterManager = monsterManager;
+	public ClientMessageProcessor() {
 	}
 
-	public void process(Object interpretedMsg, ClientMessageTransportManager messageTransportManager) throws InterruptedException {
+	public void process(Object interpretedMsg, ClientMessageTransportManager messageTransportManager, MonsterManager monsterManager) throws InterruptedException {
 		if (interpretedMsg instanceof CharacterMotion) {
 			CharacterMotion motion = (CharacterMotion) interpretedMsg;
 			String targetMonsterId = motion.getTargetId();
@@ -26,6 +24,7 @@ public class ClientMessageProcessor {
 			monster.setHp(chdHp);
 			//update monster status at the broadcaster
 			monsterManager.updateMonsterStatus(monster);
+			System.out.println("update monster status : " + monster.getId() + ", hp : " + monster.getHp() + ", from : " + motion.getCharacterId());
 			//send updated monster status
 			send(messageTransportManager, monster);
 		} else if (interpretedMsg instanceof ChatMessage) {

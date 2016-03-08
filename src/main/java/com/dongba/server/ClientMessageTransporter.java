@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.dongba.model.Account;
+import com.dongba.model.Monster;
 
 public class ClientMessageTransporter extends Thread {
 	
@@ -14,19 +17,31 @@ public class ClientMessageTransporter extends Thread {
 	private ClientMessageInterpreter clientMessageInterpreter;
 	private ClientMessageProcessor clientMessageProcessor;
 	private Account account;
+	private MonsterManager monsterManager;
 
 	public ClientMessageTransporter(Socket socket, ClientMessageTransportManager messageSender, MonsterManager monsterManager) throws IOException {
 		this.socket = socket;
 		this.messageTransportManager = messageSender;
 		this.clientMessageInterpreter = new ClientMessageInterpreter();
-		this.clientMessageProcessor = new ClientMessageProcessor(monsterManager);
+		this.clientMessageProcessor = new ClientMessageProcessor();
+		this.monsterManager = monsterManager;
 	}
 
 	public void run() {
+		clientInitMessage();
 		try {
 			receiveMessage();
 		} catch (ClassNotFoundException e) {
 			System.out.println(e.getMessage());
+		}
+	}
+
+	private void clientInitMessage() {
+		Set<Entry<String, Monster>> monsterList = monsterManager.getMonsterList();
+		for (Entry<String, Monster> entry : monsterList) {
+			Monster monster = entry.getValue();
+			System.out.println("send monster : " + monster.getId() + ", hp : " + monster.getHp());
+			sendMessage(monster);
 		}
 	}
 
@@ -41,7 +56,7 @@ public class ClientMessageTransporter extends Thread {
 				} else {
 					Object interpretedMsg = clientMessageInterpreter.interpret(obj);
 					try {
-						clientMessageProcessor.process(interpretedMsg, messageTransportManager);
+						clientMessageProcessor.process(interpretedMsg, messageTransportManager, monsterManager);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

@@ -2,6 +2,8 @@ package com.dongba.server;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.dongba.model.Monster;
 
@@ -23,6 +25,10 @@ public class MonsterManager {
 
 	public void updateMonsterStatus(Monster monster) {
 		monsters.put(monster.getId(), monster);
+	}
+
+	public Set<Entry<String, Monster>> getMonsterList() {
+		return monsters.entrySet();
 	}
 
 }
