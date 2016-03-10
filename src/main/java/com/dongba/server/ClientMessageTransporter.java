@@ -8,9 +8,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.dongba.model.Account;
+import com.dongba.model.Character;
 import com.dongba.model.Monster;
+import com.dongba.model.Position;
 
 public class ClientMessageTransporter extends Thread {
+	
+	static private final int VL = 150;
+	
+	static private final int VH = 75;
 	
 	private ClientMessageTransportManager messageTransportManager;
 	private Socket socket;
@@ -18,6 +24,7 @@ public class ClientMessageTransporter extends Thread {
 	private ClientMessageProcessor clientMessageProcessor;
 	private Account account;
 	private MonsterManager monsterManager;
+	private CharacterPositionChecker cpc;
 
 	public ClientMessageTransporter(Socket socket, ClientMessageTransportManager messageSender, MonsterManager monsterManager) throws IOException {
 		this.socket = socket;
@@ -25,6 +32,7 @@ public class ClientMessageTransporter extends Thread {
 		this.clientMessageInterpreter = new ClientMessageInterpreter();
 		this.clientMessageProcessor = new ClientMessageProcessor();
 		this.monsterManager = monsterManager;
+		this.cpc = new CharacterPositionChecker(VL, VH);
 	}
 
 	public void run() {
@@ -38,10 +46,17 @@ public class ClientMessageTransporter extends Thread {
 
 	private void clientInitMessage() {
 		Set<Entry<String, Monster>> monsterList = monsterManager.getMonsterList();
+		Character character = account.getCharacter();
+		Position posChar = character.getPos();
+		cpc.computeLL(posChar);
+		cpc.computeRU(posChar);
 		for (Entry<String, Monster> entry : monsterList) {
 			Monster monster = entry.getValue();
-			System.out.println("send monster : " + monster.getId() + ", hp : " + monster.getHp());
-			sendMessage(monster);
+			Position posMon = monster.getPos();
+			if (cpc.isView(posMon)) {
+				System.out.println("send monster : " + monster.getId() + ", hp : " + monster.getHp());
+				sendMessage(monster);
+			}
 		}
 	}
 

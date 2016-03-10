@@ -16,6 +16,8 @@ public class Monster implements Serializable {
 	private String name;
 	
 	private int hp;
+	
+	private Position pos;
 
 	private int type;
 	
@@ -57,6 +59,14 @@ public class Monster implements Serializable {
 
 	public void setFromCharacter(String fromCharacter) {
 		this.fromCharacter = fromCharacter;
+	}
+	
+	public Position getPos() {
+		return pos;
+	}
+
+	public void setPos(Position pos) {
+		this.pos = pos;
 	}
 
 	@Override
