@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 import com.dongba.model.Monster;
+import com.dongba.model.Position;
 
 public class LineageServer extends Thread {
 	
@@ -53,8 +54,12 @@ public class LineageServer extends Thread {
 			String monsterSpec = in.nextLine();
 			
 			String[] split = monsterSpec.split(" ");
-			// "oak#1 oak 1000"
+			// "oak#1 oak 1000" 100 200(id name hp x y)
 			Monster monster = new Monster(null, split[0], split[1], Integer.parseInt(split[2]));
+			int x = Integer.parseInt(split[3]);
+			int y = Integer.parseInt(split[4]);
+			Position pos = new Position(x, y);
+			monster.setPos(pos);
 			server.addNForwardMonster(monster);
 		}
 	}

@@ -36,7 +36,6 @@ public class ClientMessageTransporter extends Thread {
 	}
 
 	public void run() {
-		clientInitMessage();
 		try {
 			receiveMessage();
 		} catch (ClassNotFoundException e) {
@@ -44,17 +43,16 @@ public class ClientMessageTransporter extends Thread {
 		}
 	}
 
-	private void clientInitMessage() {
+	private void initClientConnection() {
 		Set<Entry<String, Monster>> monsterList = monsterManager.getMonsterList();
 		Character character = account.getCharacter();
-		Position posChar = character.getPos();
-		cpc.computeLL(posChar);
-		cpc.computeRU(posChar);
+		cpc.setCharacter(character);
+		cpc.computeCharPosition();
 		for (Entry<String, Monster> entry : monsterList) {
 			Monster monster = entry.getValue();
 			Position posMon = monster.getPos();
 			if (cpc.isView(posMon)) {
-				System.out.println("send monster : " + monster.getId() + ", hp : " + monster.getHp());
+				System.out.println("send monster : " + monster.getId() + ", hp : " + monster.getHp() + " (" + character.getName() + ")");
 				sendMessage(monster);
 			}
 		}
@@ -66,8 +64,11 @@ public class ClientMessageTransporter extends Thread {
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 				Object obj = in.readObject();
 				if (obj instanceof Account) {
-					this.account = (Account) obj;
+					account = (Account) obj;
+					//TODO: getting character info with the id
+					account.getCharacter().setPos(new Position(200, 150));
 					System.out.println("user " + account.getId() + " is logged in.");
+					initClientConnection();
 				} else {
 					Object interpretedMsg = clientMessageInterpreter.interpret(obj);
 					try {
@@ -78,6 +79,7 @@ public class ClientMessageTransporter extends Thread {
 				}
 			}
 		} catch (IOException e) {
+			//TODO: setting character info with the id
 			System.out.println("user " + account.getId() + " is logged out.");
 			try {
 				messageTransportManager.removeNRelease(this.getName());

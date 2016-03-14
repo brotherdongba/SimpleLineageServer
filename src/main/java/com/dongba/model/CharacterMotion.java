@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 public class CharacterMotion implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5153139806296677435L;
 	
 	private String characterId;

@@ -1,10 +1,22 @@
 package com.dongba.model;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable {
 	
+	private static final long serialVersionUID = 5947741759247868348L;
+
 	private int x;
 	
 	private int y;
+	
+	public Position() {
+	}
+
+	public Position(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
 
 	public int getX() {
 		return x;

@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 public class Monster implements Serializable {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2235321415253057213L;
 	
 	private String fromCharacter;

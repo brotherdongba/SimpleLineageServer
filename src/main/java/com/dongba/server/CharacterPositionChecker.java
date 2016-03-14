@@ -1,5 +1,6 @@
 package com.dongba.server;
 
+import com.dongba.model.Character;
 import com.dongba.model.Position;
 
 public class CharacterPositionChecker {
@@ -11,20 +12,33 @@ public class CharacterPositionChecker {
 	private Position ll;
 	
 	private Position ru;
-	
+
+	private Position pos;
+
 	public CharacterPositionChecker(int vl, int vh) {
 		this.vl = vl;
 		this.vh = vh;
+		ll = new Position();
+		ru = new Position();
 	}
 	
-	public void computeLL(Position pos) {
+	public void setCharacter(Character character) {
+		this.pos = character.getPos();
+	}
+	
+	public void computeCharPosition() {
+		computeLL();
+		computeRU();
+	}
+	
+	private void computeLL() {
 		int llx = pos.getX() - vl;
 		int lly = pos.getY() - vh;
 		ll.setX(llx);
 		ll.setY(lly);
 	}
 	
-	public void computeRU(Position pos) {
+	private void computeRU() {
 		int llx = pos.getX() + vl;
 		int lly = pos.getY() + vh;
 		ru.setX(llx);
