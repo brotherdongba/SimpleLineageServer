@@ -13,34 +13,29 @@ public class CharacterPositionChecker {
 	
 	private Position ru;
 
-	private Position pos;
-
 	public CharacterPositionChecker(int vl, int vh) {
 		this.vl = vl;
 		this.vh = vh;
-		ll = new Position();
-		ru = new Position();
 	}
 	
-	public void setCharacter(Character character) {
-		this.pos = character.getPos();
+	public void computeCharPosition(Character currCharacter) {
+		Position pos = currCharacter.getPosition();
+		computeLL(pos);
+		computeRU(pos);
 	}
 	
-	public void computeCharPosition() {
-		computeLL();
-		computeRU();
-	}
-	
-	private void computeLL() {
+	private void computeLL(Position pos) {
 		int llx = pos.getX() - vl;
 		int lly = pos.getY() - vh;
+		ll = new Position();
 		ll.setX(llx);
 		ll.setY(lly);
 	}
 	
-	private void computeRU() {
+	private void computeRU(Position pos) {
 		int llx = pos.getX() + vl;
 		int lly = pos.getY() + vh;
+		ru = new Position();
 		ru.setX(llx);
 		ru.setY(lly);
 	}

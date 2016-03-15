@@ -58,7 +58,7 @@ public class Monster implements Serializable {
 		this.fromCharacter = fromCharacter;
 	}
 	
-	public Position getPos() {
+	public Position getPosition() {
 		return pos;
 	}
 

@@ -1,5 +1,6 @@
 package com.dongba.server;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,11 +23,9 @@ public class ClientMessageBroadcastSender {
 				}
 			}
 			if (messageTransporter.sendMessage(obj) == false) {
-				System.out.println("user " + account.getId() + " is logged out.");
 				try {
-					messageTransportManager.removeNRelease(messageTransporter.getName());
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+					messageTransporter.disconnect();
+				} catch (IOException e) {
 				}
 			}
 		}

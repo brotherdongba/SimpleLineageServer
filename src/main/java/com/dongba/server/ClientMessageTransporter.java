@@ -25,6 +25,8 @@ public class ClientMessageTransporter extends Thread {
 	private Account account;
 	private MonsterManager monsterManager;
 	private CharacterPositionChecker cpc;
+	private CharacterManager csm;
+	private Character currCharacter;
 
 	public ClientMessageTransporter(Socket socket, ClientMessageTransportManager messageSender, MonsterManager monsterManager) throws IOException {
 		this.socket = socket;
@@ -32,7 +34,6 @@ public class ClientMessageTransporter extends Thread {
 		this.clientMessageInterpreter = new ClientMessageInterpreter();
 		this.clientMessageProcessor = new ClientMessageProcessor();
 		this.monsterManager = monsterManager;
-		this.cpc = new CharacterPositionChecker(VL, VH);
 	}
 
 	public void run() {
@@ -43,16 +44,17 @@ public class ClientMessageTransporter extends Thread {
 		}
 	}
 
-	private void initClientConnection() {
+	private void initCharacterSelection(String currCharacterName) throws IOException {
+		csm = new CharacterManager(currCharacterName);
+		currCharacter = csm.loadCurrCharacter();
 		Set<Entry<String, Monster>> monsterList = monsterManager.getMonsterList();
-		Character character = account.getCharacter();
-		cpc.setCharacter(character);
-		cpc.computeCharPosition();
+		cpc = new CharacterPositionChecker(VL, VH);
+		cpc.computeCharPosition(currCharacter);
 		for (Entry<String, Monster> entry : monsterList) {
 			Monster monster = entry.getValue();
-			Position posMon = monster.getPos();
+			Position posMon = monster.getPosition();
 			if (cpc.isView(posMon)) {
-				System.out.println("send monster : " + monster.getId() + ", hp : " + monster.getHp() + " (" + character.getName() + ")");
+				System.out.println("send monster : " + monster.getId() + ", hp : " + monster.getHp() + " (" + currCharacterName + ")");
 				sendMessage(monster);
 			}
 		}
@@ -65,10 +67,9 @@ public class ClientMessageTransporter extends Thread {
 				Object obj = in.readObject();
 				if (obj instanceof Account) {
 					account = (Account) obj;
-					//TODO: getting character info with the id
-					account.getCharacter().setPos(new Position(200, 150));
-					System.out.println("user " + account.getId() + " is logged in.");
-					initClientConnection();
+					String currCharacterName = account.getCurrCharacterName();
+					System.out.println("user " + account.getId() + " is logged in selecting charater with " + currCharacterName);
+					initCharacterSelection(currCharacterName);
 				} else {
 					Object interpretedMsg = clientMessageInterpreter.interpret(obj);
 					try {
@@ -79,12 +80,24 @@ public class ClientMessageTransporter extends Thread {
 				}
 			}
 		} catch (IOException e) {
-			//TODO: setting character info with the id
-			System.out.println("user " + account.getId() + " is logged out.");
 			try {
-				messageTransportManager.removeNRelease(this.getName());
-			} catch (InterruptedException e1) {
+				disconnect();
+			} catch (IOException e1) {
 			}
+		}
+	}
+
+	public void disconnect() throws IOException {
+		System.out.println("user " + account.getId() + " is logged out.");
+		csm.saveCurrCharacter(currCharacter);
+		clientMessageInterpreter = null;
+		clientMessageProcessor = null;
+		cpc = null;
+		csm = null;
+		currCharacter = null;
+		try {
+			messageTransportManager.removeNRelease(this.getName());
+		} catch (InterruptedException e1) {
 		}
 	}
 
