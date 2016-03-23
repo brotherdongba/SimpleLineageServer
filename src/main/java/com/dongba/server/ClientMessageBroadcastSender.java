@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.dongba.model.Account;
-import com.dongba.model.ChatMessage;
+import com.dongba.dto.Account;
+import com.dongba.dto.ChatMessage;
 
 public class ClientMessageBroadcastSender {
 

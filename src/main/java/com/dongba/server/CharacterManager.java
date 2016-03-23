@@ -2,7 +2,7 @@ package com.dongba.server;
 
 import java.io.IOException;
 
-import com.dongba.model.Character;
+import com.dongba.dto.CharacterDto;
 
 public class CharacterManager {
 	
@@ -15,11 +15,11 @@ public class CharacterManager {
 		charDAO = new CharacterDAO();
 	}
 
-	public Character loadCurrCharacter() throws IOException {
+	public CharacterDto loadCurrCharacter() throws IOException {
 		return charDAO.load(currCharacterName);
 	}
 
-	public void saveCurrCharacter(Character currCharacter) throws IOException {
+	public void saveCurrCharacter(CharacterDto currCharacter) throws IOException {
 		charDAO.save(currCharacter);
 	}
 

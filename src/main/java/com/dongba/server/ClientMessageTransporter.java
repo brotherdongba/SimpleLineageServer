@@ -7,10 +7,10 @@ import java.net.Socket;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.dongba.model.Account;
-import com.dongba.model.Character;
-import com.dongba.model.Monster;
-import com.dongba.model.Position;
+import com.dongba.dto.Account;
+import com.dongba.dto.CharacterDto;
+import com.dongba.dto.Monster;
+import com.dongba.dto.Position;
 
 public class ClientMessageTransporter extends Thread {
 	
@@ -26,7 +26,7 @@ public class ClientMessageTransporter extends Thread {
 	private MonsterManager monsterManager;
 	private CharacterPositionChecker cpc;
 	private CharacterManager csm;
-	private Character currCharacter;
+	private CharacterDto currCharacter;
 
 	public ClientMessageTransporter(Socket socket, ClientMessageTransportManager messageSender, MonsterManager monsterManager) throws IOException {
 		this.socket = socket;

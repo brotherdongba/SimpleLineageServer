@@ -7,3 +7,5 @@
 .gradle/2.2.1/taskArtifacts/taskArtifacts.bin
 .settings/org.eclipse.jdt.core.prefs
 bin/.gitignore
+/build/
+.gradle/2.2.1/taskArtifacts/cache.properties

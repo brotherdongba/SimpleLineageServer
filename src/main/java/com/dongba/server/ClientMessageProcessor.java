@@ -1,8 +1,8 @@
 package com.dongba.server;
 
-import com.dongba.model.CharacterMotion;
-import com.dongba.model.ChatMessage;
-import com.dongba.model.Monster;
+import com.dongba.dto.CharacterMotion;
+import com.dongba.dto.ChatMessage;
+import com.dongba.dto.Monster;
 
 public class ClientMessageProcessor {
 

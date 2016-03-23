@@ -1,7 +1,7 @@
 package com.dongba.server;
 
-import com.dongba.model.Character;
-import com.dongba.model.Position;
+import com.dongba.dto.CharacterDto;
+import com.dongba.dto.Position;
 
 public class CharacterPositionChecker {
 	
@@ -18,7 +18,7 @@ public class CharacterPositionChecker {
 		this.vh = vh;
 	}
 	
-	public void computeCharPosition(Character currCharacter) {
+	public void computeCharPosition(CharacterDto currCharacter) {
 		Position pos = currCharacter.getPosition();
 		computeLL(pos);
 		computeRU(pos);

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.dongba.model.Monster;
+import com.dongba.dto.Monster;
 
 public class MonsterManager {
 	

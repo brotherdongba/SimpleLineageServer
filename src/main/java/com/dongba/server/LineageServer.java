@@ -5,8 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-import com.dongba.model.Monster;
-import com.dongba.model.Position;
+import com.dongba.dto.Monster;
+import com.dongba.dto.Position;
 
 public class LineageServer extends Thread {
 	

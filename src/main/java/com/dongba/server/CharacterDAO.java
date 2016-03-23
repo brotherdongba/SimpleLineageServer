@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 
-import com.dongba.model.Character;
+import com.dongba.dto.CharacterDto;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -24,13 +24,13 @@ public class CharacterDAO {
 		
 	}
 
-	public Character load(String currCharacterName) throws IOException {
+	public CharacterDto load(String currCharacterName) throws IOException {
 		Path currCharacterIdPath = Paths.get(projectRoot, CHARACTER_MANAGER, currCharacterName);
 		String currCharacterString = FileUtils.readFileToString(currCharacterIdPath.toFile());
-		return gson.fromJson(currCharacterString, Character.class);
+		return gson.fromJson(currCharacterString, CharacterDto.class);
 	}
 
-	public void save(Character currCharacter) throws IOException {
+	public void save(CharacterDto currCharacter) throws IOException {
 		Path currCharacterNamePath = Paths.get(projectRoot, CHARACTER_MANAGER, currCharacter.getName());
 		String currCharacterString = gson.toJson(currCharacter);
 		FileUtils.writeStringToFile(currCharacterNamePath.toFile(), currCharacterString, false);
